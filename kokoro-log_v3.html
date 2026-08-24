@@ -1,0 +1,1206 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
+<title>心ログ</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="心ログ">
+<meta name="theme-color" content="#EEF1EA">
+<link rel="manifest" href="data:application/manifest+json,%7B%22name%22%3A%20%22%E5%BF%83%E3%83%AD%E3%82%B0%22%2C%20%22short_name%22%3A%20%22%E5%BF%83%E3%83%AD%E3%82%B0%22%2C%20%22start_url%22%3A%20%22.%22%2C%20%22display%22%3A%20%22standalone%22%2C%20%22background_color%22%3A%20%22%23EEF1EA%22%2C%20%22theme_color%22%3A%20%22%23EEF1EA%22%7D">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;500;600&family=Zen+Maru+Gothic:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #EEF1EA;
+    --bg-soft: #F7F8F4;
+    --paper: #FFFFFF;
+    --ink: #383B33;
+    --ink-soft: #6B6E63;
+    --ink-faint: #A2A599;
+    --ink-on-dark: #F7F8F4;
+    --moss-50: #E4EBDF;
+    --moss-200: #BFD1B4;
+    --moss-400: #8CAB7C;
+    --moss-600: #5C7E4E;
+    --moss-800: #3E5A37;
+    --plum: #8D7A9C;
+    --plum-soft: #EDE7F1;
+    --sand: #D9C6A0;
+    --sand-soft: #F3ECDC;
+    --sky: #8FAEBF;
+    --sky-soft: #E6EEF1;
+    --line: #E1E3DA;
+    --radius-lg: 24px;
+    --radius-md: 16px;
+    --radius-sm: 10px;
+    --shadow: 0 2px 14px rgba(56, 59, 51, 0.06);
+    --font-display: "Shippori Mincho", serif;
+    --font-body: "Zen Maru Gothic", "Hiragino Maru Gothic ProN", "Yu Gothic", sans-serif;
+  }
+  *{ box-sizing: border-box; }
+  html, body{
+    margin:0; padding:0;
+    height: 100%;
+    overscroll-behavior-y: none;
+  }
+  body{
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--font-body);
+    -webkit-font-smoothing: antialiased;
+    min-height: 100dvh;
+  }
+  #app{
+    max-width: 480px;
+    margin: 0 auto;
+    min-height: 100dvh;
+    padding-bottom: 104px;
+    position: relative;
+  }
+  ::selection{ background: var(--moss-200); }
+  button{ font-family: inherit; }
+  input, textarea{ font-family: inherit; }
+
+  /* ---------- Top bar ---------- */
+  .topbar{
+    padding: 28px 22px 14px;
+  }
+  .topbar .eyebrow{
+    font-size: 12px;
+    letter-spacing: 0.14em;
+    color: var(--ink-faint);
+    margin-bottom: 2px;
+  }
+  .topbar h1{
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 26px;
+    margin: 0;
+    color: var(--moss-800);
+  }
+  .topbar .date{
+    font-size: 13px;
+    color: var(--ink-soft);
+    margin-top: 4px;
+  }
+
+  /* ---------- Sections / cards ---------- */
+  .section{
+    padding: 6px 20px 26px;
+  }
+  .card{
+    background: var(--paper);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow);
+    padding: 20px;
+    margin-bottom: 16px;
+  }
+  .card-title{
+    font-family: var(--font-display);
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--moss-800);
+    margin: 0 0 12px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .muted{ color: var(--ink-soft); font-size: 13px; line-height: 1.7; }
+  .empty-hint{
+    color: var(--ink-faint);
+    font-size: 13px;
+    line-height: 1.8;
+    padding: 10px 2px 4px;
+  }
+
+  /* ---------- Score orb ---------- */
+  .orb-wrap{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 8px 0 4px;
+  }
+  .orb{
+    width: 158px;
+    height: 158px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    animation: breathe 5s ease-in-out infinite;
+  }
+  @keyframes breathe{
+    0%,100%{ transform: scale(1); }
+    50%{ transform: scale(1.035); }
+  }
+  @media (prefers-reduced-motion: reduce){
+    .orb{ animation: none; }
+  }
+  .orb-inner{
+    text-align: center;
+  }
+  .orb-num{
+    font-family: var(--font-display);
+    font-size: 40px;
+    font-weight: 600;
+    line-height: 1;
+  }
+  .orb-num small{ font-size: 15px; font-weight: 500; opacity: 0.75; }
+  .orb-label{
+    font-size: 12px;
+    margin-top: 6px;
+    opacity: 0.85;
+  }
+  .orb-caption{
+    text-align: center;
+    font-size: 13px;
+    color: var(--ink-soft);
+    margin-top: 14px;
+    line-height: 1.7;
+    padding: 0 12px;
+  }
+
+  /* ---------- List items ---------- */
+  .item-row{
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 2px;
+    border-bottom: 1px solid var(--line);
+  }
+  .item-row:last-child{ border-bottom: none; }
+  .check{
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    border: 2px solid var(--moss-400);
+    flex: none;
+    display: flex; align-items:center; justify-content:center;
+    cursor: pointer;
+    background: transparent;
+    transition: background 0.2s;
+  }
+  .check.done{ background: var(--moss-400); }
+  .check.done::after{
+    content:"";
+    width: 8px; height: 5px;
+    border-left: 2px solid white;
+    border-bottom: 2px solid white;
+    transform: rotate(-45deg) translate(0,-1px);
+  }
+  .item-text{
+    flex: 1;
+    font-size: 14.5px;
+    line-height: 1.5;
+    word-break: break-word;
+    cursor: text;
+    min-width: 0;
+  }
+  .item-text.done{ color: var(--ink-faint); text-decoration: line-through; text-decoration-color: var(--ink-faint); }
+  .item-edit-input{
+    flex: 1;
+    min-width: 0;
+    font-size: 14.5px;
+    padding: 6px 8px;
+    border: 1px solid var(--moss-400);
+    border-radius: 8px;
+    background: var(--bg-soft);
+    color: var(--ink);
+  }
+  .item-icon-btn{
+    border: none; background: none; color: var(--ink-faint);
+    font-size: 14px; cursor: pointer; padding: 4px 5px; line-height:1;
+    flex: none;
+  }
+  .item-del{
+    border: none; background: none; color: var(--ink-faint);
+    font-size: 18px; cursor: pointer; padding: 4px 6px; line-height:1;
+    flex: none;
+  }
+  .stars{ font-size: 13px; color: var(--sand); letter-spacing: 1px; flex: none; }
+
+  /* ---------- Add row ---------- */
+  .add-row{
+    display: flex; gap: 8px; margin-top: 10px;
+  }
+  .add-row input, .add-row textarea{
+    flex: 1;
+    min-width: 0;
+    border: 1px solid var(--line);
+    background: var(--bg-soft);
+    border-radius: var(--radius-sm);
+    padding: 10px 12px;
+    font-size: 14px;
+    color: var(--ink);
+  }
+  .add-row input:focus, .add-row textarea:focus, .diary-textarea:focus{
+    outline: none;
+    border-color: var(--moss-400);
+  }
+  .btn{
+    border: none;
+    border-radius: var(--radius-sm);
+    padding: 10px 16px;
+    font-size: 13.5px;
+    font-weight: 700;
+    cursor: pointer;
+    background: var(--moss-600);
+    color: white;
+    white-space: nowrap;
+    flex: none;
+  }
+  .btn:active{ transform: scale(0.97); }
+  .btn.secondary{
+    background: var(--bg-soft);
+    color: var(--moss-800);
+    border: 1px solid var(--moss-200);
+  }
+  .btn.ghost{
+    background: transparent;
+    color: var(--ink-soft);
+    border: 1px solid var(--line);
+  }
+  .btn.small{ padding: 6px 12px; font-size: 12.5px; }
+  .btn:disabled{ opacity: 0.5; cursor: default; }
+
+  .star-picker{ display:flex; gap:4px; margin-top:8px; }
+  .star-picker span{ font-size: 20px; cursor: pointer; color: var(--line); }
+  .star-picker span.active{ color: var(--sand); }
+
+  /* ---------- Sub tabs ---------- */
+  .subtabs{
+    display: flex;
+    gap: 6px;
+    padding: 0 20px 14px;
+  }
+  .subtab{
+    flex: 1;
+    text-align: center;
+    padding: 9px 4px;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 700;
+    background: var(--bg-soft);
+    color: var(--ink-soft);
+    cursor: pointer;
+    border: 1px solid transparent;
+  }
+  .subtab.active{
+    background: var(--moss-50);
+    color: var(--moss-800);
+    border-color: var(--moss-200);
+  }
+
+  /* ---------- Diary ---------- */
+  .diary-textarea{
+    width: 100%;
+    min-height: 160px;
+    border: 1px solid var(--line);
+    background: var(--bg-soft);
+    border-radius: var(--radius-md);
+    padding: 14px;
+    font-size: 14.5px;
+    line-height: 1.8;
+    color: var(--ink);
+    resize: vertical;
+  }
+  .diary-nav{
+    display:flex; align-items:center; justify-content:space-between;
+    margin-bottom: 12px;
+  }
+  .diary-nav .navdate{ font-family: var(--font-display); font-size: 15px; color: var(--moss-800); }
+  .iconbtn{
+    border:none; background: var(--bg-soft); width:32px; height:32px; border-radius:50%;
+    color: var(--ink-soft); font-size: 15px; cursor:pointer;
+  }
+  .save-toast{
+    font-size: 12px; color: var(--moss-600); margin-top: 8px; height: 16px;
+  }
+  .emoji-row{
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 10px;
+  }
+  .emoji-btn{
+    border: 1px solid var(--line);
+    background: var(--bg-soft);
+    border-radius: 10px;
+    font-size: 19px;
+    padding: 4px 8px;
+    cursor: pointer;
+    line-height: 1.3;
+  }
+  .emoji-btn:active{ transform: scale(0.94); }
+  .emoji-btn.active{
+    background: var(--moss-50);
+    border-color: var(--moss-400);
+    box-shadow: inset 0 0 0 1px var(--moss-400);
+  }
+
+  /* ---------- Calendar ---------- */
+  .cal-nav{
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 20px 10px;
+  }
+  .cal-nav .month{ font-family: var(--font-display); font-size: 18px; color: var(--moss-800); }
+  .cal-grid{
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 6px;
+    padding: 0 20px 10px;
+  }
+  .cal-dow{
+    text-align: center;
+    font-size: 11px;
+    color: var(--ink-faint);
+    padding-bottom: 4px;
+  }
+  .cal-cell{
+    aspect-ratio: 1;
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 12px;
+    background: var(--bg-soft);
+    border: 1px solid transparent;
+  }
+  .cal-cell.empty{ visibility: hidden; cursor: default; }
+  .cal-cell .d{ font-weight: 700; }
+  .cal-cell .s{ font-size: 9px; margin-top: 2px; opacity: 0.9; }
+  .cal-legend{
+    display:flex; align-items:center; gap:10px; padding: 4px 20px 4px;
+    font-size: 11px; color: var(--ink-faint); flex-wrap: wrap;
+  }
+  .legend-dot{ width:10px; height:10px; border-radius:3px; display:inline-block; margin-right:4px; vertical-align:-1px; }
+
+  /* ---------- Sheet / modal ---------- */
+  .sheet-overlay{
+    position: fixed; inset: 0; background: rgba(56,59,51,0.35);
+    display: flex; align-items: flex-end; justify-content: center;
+    z-index: 50;
+  }
+  .sheet{
+    background: var(--bg);
+    width: 100%; max-width: 480px;
+    border-radius: 26px 26px 0 0;
+    padding: 22px 20px calc(30px + env(safe-area-inset-bottom));
+    max-height: 82vh;
+    overflow-y: auto;
+    animation: slideup 0.25s ease-out;
+  }
+  @keyframes slideup{ from{ transform: translateY(24px); opacity:0; } to{ transform: translateY(0); opacity:1; } }
+  .sheet-head{
+    display:flex; align-items:center; justify-content:space-between;
+    margin-bottom: 14px;
+  }
+  .sheet-head h2{
+    font-family: var(--font-display); font-size: 18px; margin:0; color: var(--moss-800);
+  }
+
+  /* ---------- Bottom nav ---------- */
+  .bottomnav{
+    position: fixed;
+    left: 50%; transform: translateX(-50%);
+    bottom: 0;
+    width: 100%; max-width: 480px;
+    background: var(--paper);
+    border-top: 1px solid var(--line);
+    display: flex;
+    padding: 8px 4px calc(8px + env(safe-area-inset-bottom));
+    z-index: 40;
+  }
+  .navbtn{
+    flex: 1;
+    border: none; background: none;
+    display: flex; flex-direction: column; align-items:center; gap:3px;
+    font-size: 10.5px;
+    color: var(--ink-faint);
+    cursor: pointer;
+    padding: 4px 0;
+  }
+  .navbtn .ic{ font-size: 19px; }
+  .navbtn.active{ color: var(--moss-600); }
+
+  /* ---------- Weekly review ---------- */
+  .stat-grid{
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  .stat-box{
+    background: var(--bg-soft);
+    border-radius: var(--radius-md);
+    padding: 14px;
+    text-align: center;
+  }
+  .stat-num{ font-family: var(--font-display); font-size: 22px; color: var(--moss-800); }
+  .stat-label{ font-size: 11.5px; color: var(--ink-soft); margin-top: 2px; }
+  .voice-chip{
+    display: inline-block;
+    background: var(--moss-50);
+    color: var(--moss-800);
+    border-radius: 999px;
+    padding: 6px 14px;
+    font-size: 12.5px;
+    margin: 4px 6px 0 0;
+  }
+
+  .weekend-tag{
+    font-size: 10.5px; color: var(--plum); background: var(--plum-soft);
+    padding: 2px 8px; border-radius: 999px; margin-left: 6px;
+  }
+</style>
+</head>
+<body>
+<div id="app"></div>
+
+<script>
+/* =========================================================
+   心ログ — 状態管理
+========================================================= */
+const STORAGE_KEY = "kokoro-log-data-v1";
+
+function defaultState(){
+  return {
+    dailyWants: {},   // { "YYYY-MM-DD": [{id,text,done}] }
+    wishlist: [],      // [{id,text,createdAt,completedAt,done}]
+    restList: [],       // [{id,text,stars}]
+    weekendList: [],     // [{id,text,done,completedAt}]
+    diary: {},            // { "YYYY-MM-DD": text }
+    moods: {}              // { "YYYY-MM-DD": ["😊","😴", ...] }
+  };
+}
+
+function loadState(){
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(!raw) return defaultState();
+    const parsed = JSON.parse(raw);
+    return Object.assign(defaultState(), parsed);
+  }catch(e){
+    return defaultState();
+  }
+}
+
+function saveState(){
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+}
+
+let state = loadState();
+let ui = {
+  tab: "home",
+  wantsSub: "today",
+  calCursor: new Date(),
+  detailDate: null,
+  reviewOpen: false,
+  diaryDate: todayStr(),
+  diaryDraft: null,
+  editing: null   // "today|dateStr|id" / "wishlist|id" / "weekend|id" / "rest|id"
+};
+
+/* =========================================================
+   日付ユーティリティ
+========================================================= */
+function pad(n){ return n.toString().padStart(2,"0"); }
+function fmt(d){ return d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate()); }
+function todayStr(){ return fmt(new Date()); }
+function parseYmd(s){ const [y,m,d] = s.split("-").map(Number); return new Date(y, m-1, d); }
+const DOW = ["日","月","火","水","木","金","土"];
+function niceDate(s){
+  const d = parseYmd(s);
+  return `${d.getMonth()+1}月${d.getDate()}日（${DOW[d.getDay()]}）`;
+}
+function uid(){ return Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
+
+/* =========================================================
+   スコア
+========================================================= */
+function scoreFor(dateStr){
+  const list = state.dailyWants[dateStr];
+  if(!list || list.length === 0) return null;
+  const done = list.filter(i=>i.done).length;
+  return Math.round((done/list.length)*100);
+}
+
+function scoreRGB(score){
+  if(score === null) return null;
+  const t = score/100;
+  const c1 = [228,235,223], c2 = [92,126,78];
+  return [
+    Math.round(c1[0] + (c2[0]-c1[0])*t),
+    Math.round(c1[1] + (c2[1]-c1[1])*t),
+    Math.round(c1[2] + (c2[2]-c1[2])*t)
+  ];
+}
+function scoreColor(score){
+  const rgb = scoreRGB(score);
+  return rgb ? `rgb(${rgb[0]},${rgb[1]},${rgb[2]})` : "var(--bg-soft)";
+}
+function scoreTextColor(score){
+  const rgb = scoreRGB(score);
+  if(!rgb) return "var(--ink-soft)";
+  const luminance = 0.299*rgb[0] + 0.587*rgb[1] + 0.114*rgb[2];
+  return luminance < 150 ? "var(--ink-on-dark)" : "var(--ink)";
+}
+
+function scoreCaption(score){
+  if(score === null) return "今日はまだ何も登録されていません。小さな声でも、聞こえたら書いてみましょう。";
+  if(score >= 80) return "自分の声に、たくさん応えてあげられています。";
+  if(score >= 50) return "自分の声に、ちゃんと耳を傾けられています。";
+  if(score >= 20) return "少しだけでも、自分のために動けた日です。";
+  return "今日は難しかったかもしれません。それでも、書き残せたことが一歩です。";
+}
+
+/* =========================================================
+   レンダリング本体
+========================================================= */
+function render(){
+  const app = document.getElementById("app");
+  let html = "";
+  html += renderTopbar();
+  if(ui.tab === "home") html += renderHome();
+  else if(ui.tab === "wants") html += renderWants();
+  else if(ui.tab === "rest") html += renderRest();
+  else if(ui.tab === "diary") html += renderDiary();
+  else if(ui.tab === "calendar") html += renderCalendar();
+  html += renderBottomNav();
+  if(ui.detailDate) html += renderDetailSheet(ui.detailDate);
+  if(ui.reviewOpen) html += renderReviewSheet();
+  app.innerHTML = html;
+}
+
+function renderTopbar(){
+  const titles = {
+    home: ["今日", "心ログ"],
+    wants: ["やりたいこと", "心の声を、忘れないうちに"],
+    rest: ["休憩リスト", "疲れたときの、自分への処方箋"],
+    diary: ["日記", "その日の気持ちを、少しだけ"],
+    calendar: ["振り返り", "積み重ねてきた心の声"]
+  };
+  const [eyebrow, title] = titles[ui.tab];
+  return `
+    <div class="topbar">
+      <div class="eyebrow">${eyebrow}</div>
+      <h1>${title}</h1>
+    </div>
+  `;
+}
+
+/* ---------------- 汎用：編集可能な行 ---------------- */
+function editableRow(text, editKey, checked, toggleAttr, deleteAttr){
+  const safeKey = escapeAttr(editKey);
+  if(ui.editing === editKey){
+    return `
+      <div class="item-row">
+        ${checked===null ? "" : `<div class="check ${checked?'done':''}"></div>`}
+        <input class="item-edit-input" value="${escapeAttr(text)}" autofocus
+          onkeydown="if(event.key==='Enter'){this.blur();} if(event.key==='Escape'){cancelEdit();}"
+          onblur="commitEdit('${safeKey}', this.value)">
+        <button class="item-del" onmousedown="event.preventDefault();cancelEdit()">✕</button>
+      </div>
+    `;
+  }
+  return `
+    <div class="item-row">
+      ${checked===null ? "" : `<div class="check ${checked?'done':''}" ${toggleAttr}></div>`}
+      <div class="item-text ${checked?'done':''}" onclick="startEdit('${safeKey}')">${escapeHtml(text)}</div>
+      <button class="item-icon-btn" onclick="startEdit('${safeKey}')">✎</button>
+      <button class="item-del" ${deleteAttr}>×</button>
+    </div>
+  `;
+}
+function startEdit(key){ ui.editing = key; render(); }
+function cancelEdit(){ ui.editing = null; render(); }
+function commitEdit(key, value){
+  const text = value.trim();
+  ui.editing = null;
+  if(!text){ render(); return; }
+  const parts = key.split("|");
+  const type = parts[0];
+  if(type === "today"){
+    const [, dateStr, id] = parts;
+    const list = state.dailyWants[dateStr];
+    const item = list && list.find(i=>i.id===id);
+    if(item) item.text = text;
+  }else if(type === "wishlist"){
+    const item = state.wishlist.find(i=>i.id===parts[1]);
+    if(item) item.text = text;
+  }else if(type === "weekend"){
+    const item = state.weekendList.find(i=>i.id===parts[1]);
+    if(item) item.text = text;
+  }else if(type === "rest"){
+    const item = state.restList.find(i=>i.id===parts[1]);
+    if(item) item.text = text;
+  }
+  saveState();
+  render();
+}
+
+/* ---------------- ホーム ---------------- */
+function renderHome(){
+  const today = todayStr();
+  const list = state.dailyWants[today] || [];
+  const score = scoreFor(today);
+  const diaryText = state.diary[today];
+
+  const itemsHtml = list.length === 0
+    ? `<div class="empty-hint">今日、心の中に浮かんだ「〜したい」を書いてみましょう。散歩、読書、早く寝ること。なんでも構いません。</div>`
+    : list.map(item => editableRow(
+        item.text, `today|${today}|${item.id}`, item.done,
+        `onclick="toggleWant('${today}','${item.id}')"`,
+        `onclick="deleteWant('${today}','${item.id}')"`
+      )).join("");
+
+  return `
+    <div class="section">
+      <div class="card">
+        <div class="orb-wrap">
+          <div class="orb" style="background: radial-gradient(circle at 35% 30%, ${scoreColor(score)}dd, ${scoreColor(score)}); color:${scoreTextColor(score)};">
+            <div class="orb-inner">
+              ${score === null
+                ? `<div class="orb-num" style="font-size:20px;">未登録</div>`
+                : `<div class="orb-num">${score}<small>/100</small></div>`
+              }
+              <div class="orb-label">心の声スコア</div>
+            </div>
+          </div>
+          <div class="orb-caption">${scoreCaption(score)}</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">🌱 今日の心の声</div>
+        ${itemsHtml}
+        <div class="add-row">
+          <input id="home-want-input" type="text" placeholder="今日、したいこと・したかったこと" onkeydown="if(event.key==='Enter')addWantFromInput('home-want-input')">
+          <button class="btn" onclick="addWantFromInput('home-want-input')">追加</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">📔 今日の日記</div>
+        ${diaryText
+          ? `<div class="muted">${escapeHtml(diaryText).slice(0,80)}${diaryText.length>80?'…':''}</div>
+             <div class="add-row"><button class="btn secondary" onclick="goToDiaryToday()">日記を見る・編集する</button></div>`
+          : `<div class="empty-hint">今日はどんな一日でしたか？</div>
+             <div class="add-row"><button class="btn secondary" onclick="goToDiaryToday()">日記を書く</button></div>`
+        }
+      </div>
+    </div>
+  `;
+}
+
+function goToDiaryToday(){
+  ui.tab = "diary";
+  ui.diaryDate = todayStr();
+  ui.diaryDraft = null;
+  render();
+}
+
+function addWantFromInput(inputId){
+  const input = document.getElementById(inputId);
+  const text = input.value.trim();
+  if(!text) return;
+  input.blur();
+  const today = todayStr();
+  if(!state.dailyWants[today]) state.dailyWants[today] = [];
+  state.dailyWants[today].push({ id: uid(), text, done:false });
+  saveState();
+  render();
+}
+
+function toggleWant(dateStr, id){
+  const list = state.dailyWants[dateStr];
+  if(!list) return;
+  const item = list.find(i=>i.id===id);
+  if(item) item.done = !item.done;
+  saveState();
+  render();
+}
+
+function deleteWant(dateStr, id){
+  const list = state.dailyWants[dateStr];
+  if(!list) return;
+  state.dailyWants[dateStr] = list.filter(i=>i.id!==id);
+  saveState();
+  render();
+}
+
+/* ---------------- やりたいこと（今日 / いつか / 週末） ---------------- */
+function renderWants(){
+  let sub = "";
+  if(ui.wantsSub === "today") sub = renderWantsToday();
+  else if(ui.wantsSub === "long") sub = renderWantsLong();
+  else sub = renderWantsWeekend();
+
+  return `
+    <div class="subtabs">
+      <div class="subtab ${ui.wantsSub==='today'?'active':''}" onclick="switchWantsSub('today')">今日</div>
+      <div class="subtab ${ui.wantsSub==='long'?'active':''}" onclick="switchWantsSub('long')">いつか</div>
+      <div class="subtab ${ui.wantsSub==='weekend'?'active':''}" onclick="switchWantsSub('weekend')">週末</div>
+    </div>
+    <div class="section">${sub}</div>
+  `;
+}
+
+function switchWantsSub(s){ ui.wantsSub = s; render(); }
+
+function renderWantsToday(){
+  const today = todayStr();
+  const list = state.dailyWants[today] || [];
+  const itemsHtml = list.length === 0
+    ? `<div class="empty-hint">今日の心の声は、まだありません。</div>`
+    : list.map(item => editableRow(
+        item.text, `today|${today}|${item.id}`, item.done,
+        `onclick="toggleWant('${today}','${item.id}')"`,
+        `onclick="deleteWant('${today}','${item.id}')"`
+      )).join("");
+
+  return `
+    <div class="card">
+      <div class="card-title">今日のやりたいこと</div>
+      <div class="muted" style="margin-bottom:10px;">ここでの達成率が、心の声スコアになります。</div>
+      ${itemsHtml}
+      <div class="add-row">
+        <input id="wants-today-input" type="text" placeholder="今日したいこと" onkeydown="if(event.key==='Enter')addWantFromInput('wants-today-input')">
+        <button class="btn" onclick="addWantFromInput('wants-today-input')">追加</button>
+      </div>
+    </div>
+  `;
+}
+
+function renderWantsLong(){
+  const list = state.wishlist;
+  const itemsHtml = list.length === 0
+    ? `<div class="empty-hint">行ってみたい場所、読みたい本、食べたいもの — ふと浮かんだ「いつか」を残しておきましょう。</div>`
+    : list.slice().sort((a,b)=> a.done - b.done).map(item => editableRow(
+        item.text, `wishlist|${item.id}`, item.done,
+        `onclick="toggleWishlist('${item.id}')"`,
+        `onclick="deleteWishlist('${item.id}')"`
+      )).join("");
+
+  return `
+    <div class="card">
+      <div class="card-title">いつかやりたいこと</div>
+      ${itemsHtml}
+      <div class="add-row">
+        <input id="wants-long-input" type="text" placeholder="行きたい場所・読みたい本など" onkeydown="if(event.key==='Enter')addWishlist()">
+        <button class="btn" onclick="addWishlist()">追加</button>
+      </div>
+    </div>
+  `;
+}
+
+function addWishlist(){
+  const input = document.getElementById("wants-long-input");
+  const text = input.value.trim();
+  if(!text) return;
+  input.blur();
+  state.wishlist.push({ id: uid(), text, createdAt: todayStr(), completedAt: null, done: false });
+  saveState();
+  render();
+}
+function toggleWishlist(id){
+  const item = state.wishlist.find(i=>i.id===id);
+  if(!item) return;
+  item.done = !item.done;
+  item.completedAt = item.done ? todayStr() : null;
+  saveState();
+  render();
+}
+function deleteWishlist(id){
+  state.wishlist = state.wishlist.filter(i=>i.id!==id);
+  saveState();
+  render();
+}
+
+function renderWantsWeekend(){
+  const list = state.weekendList;
+  const itemsHtml = list.length === 0
+    ? `<div class="empty-hint">平日の忙しさで忘れてしまいがちな「週末にしたいこと」を、ここに置いておきましょう。</div>`
+    : list.slice().sort((a,b)=> a.done - b.done).map(item => editableRow(
+        item.text, `weekend|${item.id}`, item.done,
+        `onclick="toggleWeekend('${item.id}')"`,
+        `onclick="deleteWeekend('${item.id}')"`
+      )).join("");
+
+  return `
+    <div class="card">
+      <div class="card-title">週末やりたいこと</div>
+      <div class="muted" style="margin-bottom:10px;">チェックしても心の声スコアには影響しません。気楽にどうぞ。</div>
+      ${itemsHtml}
+      <div class="add-row">
+        <input id="wants-weekend-input" type="text" placeholder="週末にしたいこと" onkeydown="if(event.key==='Enter')addWeekend()">
+        <button class="btn" onclick="addWeekend()">追加</button>
+      </div>
+    </div>
+  `;
+}
+function addWeekend(){
+  const input = document.getElementById("wants-weekend-input");
+  const text = input.value.trim();
+  if(!text) return;
+  input.blur();
+  state.weekendList.push({ id: uid(), text, done:false, completedAt:null });
+  saveState();
+  render();
+}
+function toggleWeekend(id){
+  const item = state.weekendList.find(i=>i.id===id);
+  if(!item) return;
+  item.done = !item.done;
+  item.completedAt = item.done ? todayStr() : null;
+  saveState();
+  render();
+}
+function deleteWeekend(id){
+  state.weekendList = state.weekendList.filter(i=>i.id!==id);
+  saveState();
+  render();
+}
+
+/* ---------------- 休憩リスト ---------------- */
+function renderRest(){
+  const list = state.restList;
+  const itemsHtml = list.length === 0
+    ? `<div class="empty-hint">疲れたとき、自分なら何をすると少し楽になりますか？ 5分目を閉じる、温かい飲み物を飲む、何もしない — なんでも構いません。</div>`
+    : list.map(item => `
+      <div class="item-row">
+        <div class="stars">${"★".repeat(item.stars)}${"☆".repeat(5-item.stars)}</div>
+        ${ui.editing === `rest|${item.id}`
+          ? `<input class="item-edit-input" value="${escapeAttr(item.text)}" autofocus
+               onkeydown="if(event.key==='Enter'){this.blur();} if(event.key==='Escape'){cancelEdit();}"
+               onblur="commitEdit('rest|${item.id}', this.value)">
+             <button class="item-del" onmousedown="event.preventDefault();cancelEdit()">✕</button>`
+          : `<div class="item-text" onclick="startEdit('rest|${item.id}')">${escapeHtml(item.text)}</div>
+             <button class="item-icon-btn" onclick="startEdit('rest|${item.id}')">✎</button>
+             <button class="item-del" onclick="deleteRest('${item.id}')">×</button>`
+        }
+      </div>
+    `).join("");
+
+  return `
+    <div class="section">
+      <div class="card">
+        <div class="card-title">休憩リスト</div>
+        <div class="muted" style="margin-bottom:10px;">疲れたときに開くための、自分への処方箋リストです。</div>
+        ${itemsHtml}
+        <div style="margin-top:14px;">
+          <input id="rest-input" type="text" placeholder="休まると思うこと" style="width:100%;border:1px solid var(--line);background:var(--bg-soft);border-radius:10px;padding:10px 12px;font-size:14px;">
+          <div class="muted" style="margin:8px 0 2px;">やすらぎレベル</div>
+          <div class="star-picker" id="rest-star-picker">
+            ${[1,2,3,4,5].map(n=>`<span data-n="${n}" class="${n<=restStarDraft?'active':''}" onclick="setRestStars(${n})">★</span>`).join("")}
+          </div>
+          <div class="add-row" style="margin-top:10px;">
+            <button class="btn" style="flex:1;" onclick="addRest()">休憩リストに追加</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+let restStarDraft = 3;
+function setRestStars(n){
+  restStarDraft = n;
+  document.querySelectorAll("#rest-star-picker span").forEach(el=>{
+    el.classList.toggle("active", Number(el.dataset.n) <= n);
+  });
+}
+function addRest(){
+  const input = document.getElementById("rest-input");
+  const text = input.value.trim();
+  if(!text) return;
+  input.blur();
+  state.restList.push({ id: uid(), text, stars: restStarDraft });
+  restStarDraft = 3;
+  saveState();
+  render();
+}
+function deleteRest(id){
+  state.restList = state.restList.filter(i=>i.id!==id);
+  saveState();
+  render();
+}
+
+/* ---------------- 日記 ---------------- */
+const DIARY_EMOJIS = ["😊","😌","🥰","😢","😴","😠","😰","😐","🎉","💪"];
+
+function renderDiary(){
+  const dateStr = ui.diaryDate;
+  const draft = ui.diaryDraft !== null ? ui.diaryDraft : (state.diary[dateStr] || "");
+  const moods = state.moods[dateStr] || [];
+  return `
+    <div class="section">
+      <div class="card">
+        <div class="diary-nav">
+          <button class="iconbtn" onclick="shiftDiaryDate(-1)">‹</button>
+          <div class="navdate">${niceDate(dateStr)}</div>
+          <button class="iconbtn" onclick="shiftDiaryDate(1)" ${dateStr>=todayStr()?'disabled style="opacity:.3"':''}>›</button>
+        </div>
+        <div class="muted" style="margin-bottom:6px;">今日の気分（文章とは別に記録されます）</div>
+        <div class="emoji-row">
+          ${DIARY_EMOJIS.map(e=>`<button type="button" class="emoji-btn ${moods.includes(e)?'active':''}" onmousedown="event.preventDefault()" onclick="toggleMood('${dateStr}','${e}')">${e}</button>`).join("")}
+        </div>
+        <textarea id="diary-textarea" class="diary-textarea" placeholder="今日はどんな一日でしたか？ 書かなければいけない、ということはありません。" oninput="ui.diaryDraft=this.value">${escapeHtml(draft)}</textarea>
+        <div class="add-row">
+          <button class="btn" onclick="saveDiary()">保存する</button>
+          ${dateStr!==todayStr() ? `<button class="btn ghost" onclick="ui.diaryDate=todayStr();ui.diaryDraft=null;render();">今日へ</button>` : ""}
+        </div>
+        <div class="save-toast" id="diary-toast"></div>
+      </div>
+    </div>
+  `;
+}
+function toggleMood(dateStr, emoji){
+  const list = state.moods[dateStr] || [];
+  if(list.includes(emoji)){
+    state.moods[dateStr] = list.filter(e=>e!==emoji);
+  }else{
+    state.moods[dateStr] = [...list, emoji];
+  }
+  if(state.moods[dateStr].length === 0) delete state.moods[dateStr];
+  saveState();
+  ui.diaryDraft = document.getElementById("diary-textarea") ? document.getElementById("diary-textarea").value : ui.diaryDraft;
+  render();
+}
+function shiftDiaryDate(delta){
+  const d = parseYmd(ui.diaryDate);
+  d.setDate(d.getDate()+delta);
+  const next = fmt(d);
+  if(next > todayStr()) return;
+  ui.diaryDate = next;
+  ui.diaryDraft = null;
+  render();
+}
+function saveDiary(){
+  const ta = document.getElementById("diary-textarea");
+  const text = ta.value;
+  if(text.trim() === ""){
+    delete state.diary[ui.diaryDate];
+  }else{
+    state.diary[ui.diaryDate] = text;
+  }
+  saveState();
+  ui.diaryDraft = null;
+  const toast = document.getElementById("diary-toast");
+  if(toast) toast.textContent = "保存しました";
+  setTimeout(()=>{ const t=document.getElementById("diary-toast"); if(t) t.textContent=""; }, 1800);
+}
+
+/* ---------------- カレンダー ---------------- */
+function renderCalendar(){
+  const cursor = ui.calCursor;
+  const year = cursor.getFullYear();
+  const month = cursor.getMonth();
+  const firstDay = new Date(year, month, 1);
+  const startOffset = firstDay.getDay();
+  const daysInMonth = new Date(year, month+1, 0).getDate();
+
+  let cells = "";
+  for(let i=0;i<startOffset;i++) cells += `<div class="cal-cell empty"></div>`;
+  for(let d=1; d<=daysInMonth; d++){
+    const dateObj = new Date(year, month, d);
+    const dateStr = fmt(dateObj);
+    const score = scoreFor(dateStr);
+    const isToday = dateStr === todayStr();
+    const textColor = scoreTextColor(score);
+    const borderColor = isToday ? (textColor === "var(--ink-on-dark)" ? "rgba(255,255,255,0.9)" : "var(--moss-600)") : "transparent";
+    cells += `
+      <div class="cal-cell" style="background:${scoreColor(score)};color:${textColor};border-color:${borderColor};" onclick="openDetail('${dateStr}')">
+        <div class="d">${d}</div>
+        <div class="s">${score===null?'':score}</div>
+      </div>
+    `;
+  }
+
+  return `
+    <div class="cal-nav">
+      <button class="iconbtn" onclick="shiftMonth(-1)">‹</button>
+      <div class="month">${year}年 ${month+1}月</div>
+      <button class="iconbtn" onclick="shiftMonth(1)">›</button>
+    </div>
+    <div class="cal-grid">
+      ${DOW.map(w=>`<div class="cal-dow">${w}</div>`).join("")}
+      ${cells}
+    </div>
+    <div class="cal-legend">
+      <span><span class="legend-dot" style="background:${scoreColor(20)}"></span>低め</span>
+      <span><span class="legend-dot" style="background:${scoreColor(60)}"></span>ふつう</span>
+      <span><span class="legend-dot" style="background:${scoreColor(95)}"></span>高め</span>
+      <span><span class="legend-dot" style="background:var(--bg-soft);border:1px solid var(--line)"></span>未登録</span>
+    </div>
+    <div class="section" style="padding-top:6px;">
+      <button class="btn secondary" style="width:100%;" onclick="openReview()">今週の振り返りを見る</button>
+    </div>
+  `;
+}
+function shiftMonth(delta){
+  const d = new Date(ui.calCursor);
+  d.setMonth(d.getMonth()+delta);
+  ui.calCursor = d;
+  render();
+}
+function openDetail(dateStr){ ui.detailDate = dateStr; render(); }
+function closeDetail(){ ui.detailDate = null; render(); }
+
+function renderDetailSheet(dateStr){
+  const list = state.dailyWants[dateStr] || [];
+  const score = scoreFor(dateStr);
+  const diaryText = state.diary[dateStr];
+  const weekendDone = state.weekendList.filter(w => w.completedAt === dateStr);
+
+  const wantsHtml = list.length === 0
+    ? `<div class="empty-hint">この日は、やりたいことの登録がありませんでした。</div>`
+    : list.map(i=>`<div class="item-row"><div class="check ${i.done?'done':''}"></div><div class="item-text ${i.done?'done':''}">${escapeHtml(i.text)}</div></div>`).join("");
+
+  return `
+    <div class="sheet-overlay" onclick="if(event.target===this)closeDetail()">
+      <div class="sheet">
+        <div class="sheet-head">
+          <h2>${niceDate(dateStr)}</h2>
+          <button class="iconbtn" onclick="closeDetail()">✕</button>
+        </div>
+        <div class="card" style="margin-bottom:12px;">
+          <div class="card-title">心の声スコア</div>
+          <div style="font-family:var(--font-display);font-size:28px;color:var(--moss-800);">
+            ${score===null ? "未登録" : score+" / 100"}
+          </div>
+        </div>
+        <div class="card" style="margin-bottom:12px;">
+          <div class="card-title">🌱 やりたいこと</div>
+          ${wantsHtml}
+        </div>
+        ${weekendDone.length ? `
+        <div class="card" style="margin-bottom:12px;">
+          <div class="card-title">🍃 週末に実行したこと</div>
+          ${weekendDone.map(w=>`<div class="item-row"><div class="item-text">${escapeHtml(w.text)}</div></div>`).join("")}
+        </div>` : ""}
+        <div class="card">
+          <div class="card-title">📔 日記</div>
+          ${(state.moods[dateStr]||[]).length ? `<div style="font-size:22px;margin-bottom:8px;">${(state.moods[dateStr]||[]).join(" ")}</div>` : ""}
+          ${diaryText ? `<div class="muted" style="white-space:pre-wrap;">${escapeHtml(diaryText)}</div>` : `<div class="empty-hint">この日の日記はありません。</div>`}
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+/* ---------------- 週次振り返り ---------------- */
+function openReview(){ ui.reviewOpen = true; render(); }
+function closeReview(){ ui.reviewOpen = false; render(); }
+
+function renderReviewSheet(){
+  const days = [];
+  for(let i=6;i>=0;i--){
+    const d = new Date();
+    d.setDate(d.getDate()-i);
+    days.push(fmt(d));
+  }
+  const scores = days.map(scoreFor).filter(s=>s!==null);
+  const avg = scores.length ? Math.round(scores.reduce((a,b)=>a+b,0)/scores.length) : null;
+  const respondedDays = days.filter(d=>{ const s=scoreFor(d); return s!==null && s>0; }).length;
+
+  let registered = 0, completed = 0;
+  days.forEach(d=>{
+    const list = state.dailyWants[d] || [];
+    registered += list.length;
+    completed += list.filter(i=>i.done).length;
+  });
+
+  const voices = [];
+  days.forEach(d=>{
+    (state.dailyWants[d]||[]).forEach(i=> voices.push(i.text));
+  });
+  const uniqueVoices = [...new Set(voices)].slice(-10).reverse();
+
+  return `
+    <div class="sheet-overlay" onclick="if(event.target===this)closeReview()">
+      <div class="sheet">
+        <div class="sheet-head">
+          <h2>今週の心ログ</h2>
+          <button class="iconbtn" onclick="closeReview()">✕</button>
+        </div>
+        <div class="card" style="margin-bottom:12px;">
+          <div class="stat-grid">
+            <div class="stat-box">
+              <div class="stat-num">${avg===null?'—':avg}</div>
+              <div class="stat-label">平均スコア</div>
+            </div>
+            <div class="stat-box">
+              <div class="stat-num">${respondedDays} / 7</div>
+              <div class="stat-label">自分の声に応えられた日</div>
+            </div>
+            <div class="stat-box">
+              <div class="stat-num">${registered}</div>
+              <div class="stat-label">今週のやりたいこと</div>
+            </div>
+            <div class="stat-box">
+              <div class="stat-num">${completed}</div>
+              <div class="stat-label">実行したこと</div>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title">今週のあなたの心の声</div>
+          ${uniqueVoices.length === 0
+            ? `<div class="empty-hint">まだ心の声が記録されていません。</div>`
+            : uniqueVoices.map(v=>`<span class="voice-chip">${escapeHtml(v)}</span>`).join("")
+          }
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+/* ---------------- 下部ナビ ---------------- */
+function renderBottomNav(){
+  const items = [
+    { key:"home", ic:"🏠", label:"ホーム" },
+    { key:"wants", ic:"🌱", label:"やりたいこと" },
+    { key:"rest", ic:"☁️", label:"休憩" },
+    { key:"diary", ic:"📔", label:"日記" },
+    { key:"calendar", ic:"📅", label:"振り返り" }
+  ];
+  return `
+    <div class="bottomnav">
+      ${items.map(it=>`
+        <button class="navbtn ${ui.tab===it.key?'active':''}" onclick="switchTab('${it.key}')">
+          <span class="ic">${it.ic}</span>
+          <span>${it.label}</span>
+        </button>
+      `).join("")}
+    </div>
+  `;
+}
+function switchTab(tab){
+  ui.tab = tab;
+  ui.editing = null;
+  if(tab === "diary"){ ui.diaryDate = todayStr(); ui.diaryDraft = null; }
+  render();
+}
+
+/* ---------------- ユーティリティ ---------------- */
+function escapeHtml(str){
+  return String(str)
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;")
+    .replaceAll("'","&#039;");
+}
+function escapeAttr(str){
+  return escapeHtml(str);
+}
+
+render();
+</script>
+</body>
+</html>
